@@ -10,7 +10,7 @@ import webbrowser
 import os
 import platform
 
-def compute_coherence_values(id2word, corpus, texts, limit, start, step):
+def compute_coherence_values(id2word, corpus, texts, limit, start, step, on_update):
     """
     Compute c_v coherence for various number of topics
 
@@ -29,6 +29,10 @@ def compute_coherence_values(id2word, corpus, texts, limit, start, step):
     coherence_values = []
     model_list = []
     
+    value_progress_bar = 5
+    n_models = len(range(start, limit, step))
+    increment_progress_bar = int(55/n_models)
+
     for num_topics in range(start, limit, step):
         model = gensim.models.ldamodel.LdaModel(corpus=corpus,
                                                    id2word=id2word,
@@ -43,6 +47,8 @@ def compute_coherence_values(id2word, corpus, texts, limit, start, step):
         model_list.append(model)
         coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=id2word, coherence='c_v')
         coherence_values.append(coherencemodel.get_coherence())
+        value_progress_bar += increment_progress_bar
+        on_update(value_progress_bar)
 
     return model_list, coherence_values
 
@@ -51,7 +57,7 @@ def sent_to_words(sentences):
         yield(gensim.utils.simple_preprocess(str(sentence), deacc=True))  # deacc=True removes punctuations
 
 
-def gensim_lda_product(product_id, start = 1, limit = 10, step = 1):
+def gensim_lda_product(product_id, n_execution, start = 1, limit = 10, step = 1, on_update=None):
     df = pd.read_csv('../clean_dataset.csv', sep = ';', encoding='latin-1')
 
     product_df = df[df['productid'] == product_id].clean_text.values.tolist()
@@ -59,16 +65,22 @@ def gensim_lda_product(product_id, start = 1, limit = 10, step = 1):
     id2word = corpora.Dictionary(data_words)
     texts = data_words
     corpus = [id2word.doc2bow(text) for text in texts]
-    model_list, coherence_values = compute_coherence_values(id2word=id2word, corpus=corpus, texts=data_words, start=start, limit=limit, step=step)
+    on_update(5)
+    model_list, coherence_values = compute_coherence_values(id2word=id2word, corpus=corpus, texts=data_words, start=start, limit=limit, step=step, on_update=on_update)
     
     # selezioniamo il modello migliore
     best_index = coherence_values.index(max(coherence_values))
     best_model = model_list[best_index]
     
     LDAvis_prepared = pyLDAvis.gensim.prepare(best_model, corpus, id2word)
-    pyLDAvis.save_html(LDAvis_prepared,'lda.html')
+    on_update(90)
+    pyLDAvis.save_html(LDAvis_prepared,f'lda_{n_execution}.html')
+    on_update(95)
+
     #pyLDAvis.show(LDAvis_prepared)
-    url = 'lda.html'
+    url = f'lda_{n_execution}.html'
     if platform.system() == 'Darwin': #Mac
         url = 'file:///' + os.path.dirname(os.path.abspath('gensim_lda.py')) + '/' + url
     webbrowser.open_new_tab(url)
+    on_update(100)
+

@@ -1,5 +1,7 @@
 import sys
 import pandas as pd
+from gensim_lda import gensim_lda_product
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QPalette
@@ -22,6 +24,7 @@ class App(QWidget):
         self.top = 10
         self.width = 540
         self.height = 400
+        self.basa_execution = 0
 
         self.initUI()
 
@@ -63,6 +66,7 @@ class App(QWidget):
 
             self.progress_bar = QProgressBar(self)
             self.progress_bar.setGeometry(QRect(250, 450, 450, 25))
+            self.progress_bar.setValue(0)
 
             vbox = QVBoxLayout()
             vbox.addWidget(self.product_label)
@@ -80,7 +84,12 @@ class App(QWidget):
             self.progress_bar.setValue(value)
             QApplication.processEvents()
 
-        update_progress_bar(50)
+        self.basa_execution += 1
+
+        parameters = {}
+        parameters["on_update"] = update_progress_bar
+
+        gensim_lda_product('B000G6RYNE', self.basa_execution, **parameters)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
