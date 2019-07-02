@@ -9,6 +9,8 @@ import pandas as pd
 import webbrowser
 import os
 import platform
+import re
+from textblob import TextBlob
 
 def compute_coherence_values(id2word, corpus, texts, start, limit, step, on_update):
     """
@@ -58,7 +60,7 @@ def sent_to_words(sentences):
 
 
 def gensim_lda_product(product_id, n_execution, start = 1, limit = 10, step = 1, on_update=None):
-    df = pd.read_csv('../clean_dataset.csv', sep = ';', encoding='latin-1')
+    df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
 
     product_df = df[df['productid'] == product_id].clean_text.values.tolist()
     data_words = list(sent_to_words(product_df))
@@ -77,6 +79,8 @@ def gensim_lda_product(product_id, n_execution, start = 1, limit = 10, step = 1,
     pyLDAvis.save_html(LDAvis_prepared,f'lda_model/lda_{n_execution}.html')
     on_update(95)
 
+    polarity_df = sentiment_topic(best_model)
+
     #pyLDAvis.show(LDAvis_prepared)
     url = f'lda_model/lda_{n_execution}.html'
     if platform.system() == 'Darwin': #Mac
@@ -84,3 +88,32 @@ def gensim_lda_product(product_id, n_execution, start = 1, limit = 10, step = 1,
     webbrowser.open_new_tab(url)
     on_update(100)
 
+def sentiment_topic(lda_model):
+    topic_words = lda_model.print_topics(num_words=100)
+    polarity_df = pd.DataFrame(columns=['topic', 'polarity'])
+    for topic in topic_words:
+        weighted_words = topic[1]
+        weighted_words = weighted_words.split(' + ')
+        weighted_words = [pair.split('*') for pair in weighted_words]
+
+        sentiment_words = []
+        sentiment_weights = []
+        for pair in weighted_words:
+            word = pair[1].lstrip('"').rstrip('"')
+            weight = float(pair[0])
+            if not TextBlob(word).sentiment.polarity == 0:
+                sentiment_words.append(word)
+                sentiment_weights.append(weight)
+
+        total_weight = sum(sentiment_weights)
+        sentiment_weights = [weight/total_weight for weight in sentiment_weights]
+
+        topic_polarity = 0
+        for word, weight in zip(sentiment_words, sentiment_weights):
+            topic_polarity += TextBlob(word).sentiment.polarity*weight
+        
+        data = [[topic[0], topic_polarity]]
+        row = pd.DataFrame(data, columns=['topic', 'polarity'])
+        polarity_df = polarity_df.append(row)
+    
+    return polarity_df
