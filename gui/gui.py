@@ -32,6 +32,7 @@ class App(QWidget):
         self.basa_execution = 0
         self.product_image = 'AmazonImages/B002QWP89S.jpg'
         self.df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
+        self.sa_df = pd.DataFrame()
 
         self.initUI()
 
@@ -78,7 +79,7 @@ class App(QWidget):
         if self.score_tb_sa.isChecked():
             analysis_field = 'score'
 
-        text_blob_sa(analysis_field)
+        text_blob_sa(self, analysis_field)
             
 
     def create_sklearn_Sentiment_Analysis(self):

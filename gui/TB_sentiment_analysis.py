@@ -19,13 +19,16 @@ def sentiment_number(sentiment):
     else:
         return 0
 
-def text_blob_sa(analysis_field):
+def text_blob_sa(self, analysis_field):
 
-    df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
+    if self.sa_df.empty:
+        df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
 
-    df['polarity'] = df['clean_text'].apply(polarity)
-    #self.df['subjectivity'] = self.df['clean_text'].apply(subjectivity)
-    df['sentiment'] = df['sentiment'].apply(sentiment_number)
+        df['polarity'] = df['clean_text'].apply(polarity)
+        #self.df['subjectivity'] = self.df['clean_text'].apply(subjectivity)
+        df['sentiment'] = df['sentiment'].apply(sentiment_number)
+    else:
+        df = self.sa_df
 
     analysis = df[analysis_field]
     if analysis_field == 'score':
@@ -51,3 +54,5 @@ def text_blob_sa(analysis_field):
     plt.legend(legend, labels)
     plt.savefig(f'graphs/tb_polarity_{analysis_field}.png', dpi = 180)
     plt.show()
+
+    self.sa_df = df
