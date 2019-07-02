@@ -1,16 +1,20 @@
+import warnings
+warnings.filterwarnings("ignore",category=DeprecationWarning)
+import os
+import re
+import pandas as pd
+import webbrowser
+import platform
+from textblob import TextBlob
+
+
+
 # Gensim
 import gensim
 import gensim.corpora as corpora
 from gensim.utils import simple_preprocess
 from gensim.models import CoherenceModel
 import pyLDAvis.gensim  # don't skip this
-
-import pandas as pd
-import webbrowser
-import os
-import platform
-import re
-from textblob import TextBlob
 
 def compute_coherence_values(id2word, corpus, texts, start, limit, step, on_update):
     """
@@ -89,6 +93,7 @@ def gensim_lda_product(product_id, n_execution, start = 1, limit = 10, step = 1,
     on_update(100)
 
 def sentiment_topic(lda_model):
+
     topic_words = lda_model.print_topics(num_words=100)
     polarity_df = pd.DataFrame(columns=['topic', 'polarity'])
     for topic in topic_words:

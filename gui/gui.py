@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore",category=DeprecationWarning)
 import sys
 import subprocess
 import pandas as pd
@@ -163,7 +165,7 @@ class App(QWidget):
 
         self.button_reset = QPushButton('Reset', self)
         self.button_reset.setToolTip('Reset')
-        self.button_reset.clicked.connect(self.on_click_reset)
+        self.button_reset.clicked.connect(self.on_click_reset_basa)
 
         self.execution_label = QLabel(self)
         self.execution_label.setText('Numero di esecuzioni:')
@@ -190,13 +192,13 @@ class App(QWidget):
 
     def on_click_update_products(self):
 
-        if not self.product_number.text() == 10:
+        if not int(self.product_number.text()) == 10:
             self.product_combobox.clear()
             product_list = load_item(self, int(self.product_number.text()))
             for item in product_list:
                 self.product_combobox.addItem(item)
 
-    def on_click_reset(self):
+    def on_click_reset_basa(self):
 
         self.basa_execution = 0
 
@@ -217,7 +219,10 @@ class App(QWidget):
     def update_image(self):
 
         #perfromScraping(str(self.product_combobox.currentText()))
-        self.product_image = f'AmazonImages/{str(self.product_combobox.currentText())}.jpg'
+        if not self.product_combobox.currentText():
+            self.product_image = 'AmazonImages/B002QWP89S.jpg'
+        else:
+            self.product_image = f'AmazonImages/{str(self.product_combobox.currentText())}.jpg'
         pixmap = QPixmap(self.product_image)
         pixmap_resized = pixmap.scaled(125, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             
@@ -245,7 +250,7 @@ class App(QWidget):
 
         self.button_run = QPushButton('Esegui', self)
         self.button_run.setToolTip('Esegui')
-        self.button_run.clicked.connect(self.on_click_run)
+        self.button_run.clicked.connect(self.on_click_run_basa)
 
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setGeometry(QRect(250, 450, 450, 25))
@@ -263,7 +268,7 @@ class App(QWidget):
 
         return groupBox
 
-    def on_click_run(self):
+    def on_click_run_basa(self):
         def update_progress_bar(value):
             self.progress_bar.setValue(value)
             QApplication.processEvents()
@@ -282,6 +287,7 @@ class App(QWidget):
             gensim_lda_product(product_id, self.basa_execution, limit = topic_limit, **parameters)
         
         self.execution.setText(str(self.basa_execution))
+        self.progress_bar.setValue(0)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
