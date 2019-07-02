@@ -1,1 +1,6 @@
 .ipynb*
+.DS_Store
+.vscode/*
+gui/__pycache__/*
+*.pyc
+*.html
