@@ -10,7 +10,7 @@ import webbrowser
 import os
 import platform
 
-def compute_coherence_values(id2word, corpus, texts, limit, start, step, on_update):
+def compute_coherence_values(id2word, corpus, texts, start, limit, step, on_update):
     """
     Compute c_v coherence for various number of topics
 
@@ -74,11 +74,11 @@ def gensim_lda_product(product_id, n_execution, start = 1, limit = 10, step = 1,
     
     LDAvis_prepared = pyLDAvis.gensim.prepare(best_model, corpus, id2word)
     on_update(90)
-    pyLDAvis.save_html(LDAvis_prepared,f'lda_{n_execution}.html')
+    pyLDAvis.save_html(LDAvis_prepared,f'lda_model/lda_{n_execution}.html')
     on_update(95)
 
     #pyLDAvis.show(LDAvis_prepared)
-    url = f'lda_{n_execution}.html'
+    url = f'lda_model/lda_{n_execution}.html'
     if platform.system() == 'Darwin': #Mac
         url = 'file:///' + os.path.dirname(os.path.abspath('gensim_lda.py')) + '/' + url
     webbrowser.open_new_tab(url)
