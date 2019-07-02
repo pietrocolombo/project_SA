@@ -1,18 +1,19 @@
 import sys
 import subprocess
 import pandas as pd
+from TB_sentiment_analysis import text_blob_sa
+from sklearn_sentiment_analysis import sklearn_sa
 from gensim_lda import gensim_lda_product
-from download_image import perfromScraping
+#from download_image import perfromScraping
 
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtGui import QPalette, QPixmap, QIntValidator
 from PyQt5.QtCore import Qt, QRect
 
-def load_item(product_number = 10):
+def load_item(self, product_number = 10):
 
-    df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
-    product_df = df[['productid']]
+    product_df = self.df[['productid']]
     most_reviwed_products = product_df['productid'].value_counts()[:product_number]
 
     return list(most_reviwed_products.index)
@@ -28,13 +29,15 @@ class App(QWidget):
         self.height = 400
         self.basa_execution = 0
         self.product_image = 'AmazonImages/B002QWP89S.jpg'
+        self.df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
 
         self.initUI()
 
     def initUI(self):
         grid = QGridLayout()
 
-        grid.addWidget(self.create_Sentiment_Analysis(), 0, 0)
+        grid.addWidget(self.create_TB_Sentiment_Analysis(), 0, 0)
+        grid.addWidget(self.create_sklearn_Sentiment_Analysis(), 1, 0)
         grid.addWidget(self.create_parameters_Base_Aspect_SA(), 0, 1)
         grid.addWidget(self.create_Base_Aspect_SA(), 1, 1)
 
@@ -44,14 +47,92 @@ class App(QWidget):
 
         self.show()
 
-    def create_Sentiment_Analysis(self):
-            groupBox = QGroupBox("Sentiment Analysis")
+    def create_TB_Sentiment_Analysis(self):
+        groupBox = QGroupBox("Sentiment Analysis con TextBlob")
 
-            vbox = QVBoxLayout()
-            vbox.addStretch(1)
-            groupBox.setLayout(vbox)
+        self.sentiment_tb_sa = QRadioButton("Sentiment")
+        self.sentiment_tb_sa.setChecked(True)
+        self.score_tb_sa = QRadioButton("Score")
 
-            return groupBox
+        self.button_tb_sa = QPushButton('Esegui', self)
+        self.button_tb_sa.setToolTip('Esegui')
+        self.button_tb_sa.clicked.connect(self.on_click_tb_sa)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.sentiment_tb_sa)
+        vbox.addWidget(self.score_tb_sa)
+        vbox.addWidget(self.button_tb_sa)
+
+        vbox.addStretch(1)
+        groupBox.setLayout(vbox)
+
+        return groupBox
+
+    def on_click_tb_sa(self):
+
+        analysis_field = ''
+        if self.sentiment_tb_sa.isChecked():
+            analysis_field = 'sentiment'
+        if self.score_tb_sa.isChecked():
+            analysis_field = 'score'
+
+        text_blob_sa(analysis_field)
+            
+
+    def create_sklearn_Sentiment_Analysis(self):
+        groupBox = QGroupBox("Sentiment Analysis con Sklearn")
+
+        self.widget = QWidget(self)
+
+        self.regression_field = QLabel(self)
+        self.regression_field.setText('Label for regression model:')
+        self.radio_group1 = QButtonGroup(self.widget)
+        self.sentiment_sklearn_sa = QRadioButton("Sentiment")
+        self.sentiment_sklearn_sa.setChecked(True)
+        self.stars_sklearn_sa = QRadioButton("Stars")
+        self.radio_group1.addButton(self.sentiment_sklearn_sa)
+        self.radio_group1.addButton(self.stars_sklearn_sa)
+
+        self.normalization = QLabel(self)
+        self.normalization.setText('Confusion matrix:')
+        self.radio_group2 = QButtonGroup(self.widget)
+        self.normalized = QRadioButton("Normalized")
+        self.normalized.setChecked(True)
+        self.not_normalized = QRadioButton("Not-Normalized")
+        self.radio_group2.addButton(self.normalized)
+        self.radio_group2.addButton(self.not_normalized)
+
+        self.button_sklearn_sa = QPushButton('Esegui', self)
+        self.button_sklearn_sa.setToolTip('Esegui')
+        self.button_sklearn_sa.clicked.connect(self.on_click_sklearn_sa)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.regression_field)
+        vbox.addWidget(self.sentiment_sklearn_sa)
+        vbox.addWidget(self.stars_sklearn_sa)
+        vbox.addWidget(self.normalization)
+        vbox.addWidget(self.normalized)
+        vbox.addWidget(self.not_normalized)
+        vbox.addWidget(self.button_sklearn_sa)
+
+        vbox.addStretch(1)
+        groupBox.setLayout(vbox)
+
+        return groupBox
+
+    def on_click_sklearn_sa(self):
+
+        analysis_field = ''
+        if self.sentiment_sklearn_sa.isChecked():
+            analysis_field = 'sentiment'
+        elif self.stars_sklearn_sa.isChecked():
+            analysis_field = 'score'
+
+        normalized = True
+        if self.not_normalized.isChecked():
+            normalized = False
+
+        sklearn_sa(analysis_field, normalized)
 
     def create_parameters_Base_Aspect_SA(self):
         groupBox = QGroupBox("Parameters for Based-Aspect SA")
@@ -111,7 +192,7 @@ class App(QWidget):
 
         if not self.product_number.text() == 10:
             self.product_combobox.clear()
-            product_list = load_item(int(self.product_number.text()))
+            product_list = load_item(self, int(self.product_number.text()))
             for item in product_list:
                 self.product_combobox.addItem(item)
 
@@ -125,7 +206,7 @@ class App(QWidget):
         self.execution.setText(str(self.basa_execution))
 
         self.product_combobox.clear()
-        product_list = load_item()
+        product_list = load_item(self)
         for item in product_list:
             self.product_combobox.addItem(item)
         self.product_combobox.setCurrentIndex(0)
@@ -149,7 +230,7 @@ class App(QWidget):
         self.product_label.setText('Prodotto:')
         
         self.product_combobox = QComboBox(self)
-        product_list = load_item()
+        product_list = load_item(self)
         for item in product_list:
             self.product_combobox.addItem(item)
         self.product_combobox.setCurrentIndex(0)
@@ -162,8 +243,8 @@ class App(QWidget):
         self.immage_original.setPixmap(pixmap_resized)
         self.immage_original.setAlignment(Qt.AlignCenter)
 
-        self.button_run = QPushButton('Run', self)
-        self.button_run.setToolTip('Run')
+        self.button_run = QPushButton('Esegui', self)
+        self.button_run.setToolTip('Esegui')
         self.button_run.clicked.connect(self.on_click_run)
 
         self.progress_bar = QProgressBar(self)
