@@ -2,15 +2,16 @@ import sys
 import subprocess
 import pandas as pd
 from gensim_lda import gensim_lda_product
+from download_image import perfromScraping
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QPalette, QPixmap
+from PyQt5.QtGui import QPalette, QPixmap, QIntValidator
 from PyQt5.QtCore import Qt, QRect
 
 def load_item(product_number = 10):
 
-    df = pd.read_csv('../clean_dataset.csv', sep = ';', encoding='latin-1')
+    df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
     product_df = df[['productid']]
     most_reviwed_products = product_df['productid'].value_counts()[:product_number]
 
@@ -26,7 +27,7 @@ class App(QWidget):
         self.width = 540
         self.height = 400
         self.basa_execution = 0
-        self.product_image = 'images/B002QWP89S.jpg'
+        self.product_image = 'AmazonImages/B002QWP89S.jpg'
 
         self.initUI()
 
@@ -58,15 +59,21 @@ class App(QWidget):
         self.topic_number_label = QLabel(self)
         self.topic_number_label.setText('Numero di topic:')
         self.topic_number = QLineEdit(self)
+        self.topic_number.setMaxLength(2)
+        self.topic_number.setValidator(QIntValidator())
 
         self.topic_limit_label = QLabel(self)
         self.topic_limit_label.setText('Limite massimo di topic:')
         self.topic_limit = QLineEdit(self)
+        self.topic_limit.setValidator(QIntValidator())
+        self.topic_limit.setMaxLength(2)
         self.topic_limit.setText('10')
 
         self.product_number_label = QLabel(self)
         self.product_number_label.setText('Numero di prodotti disponibili:')
         self.product_number = QLineEdit(self)
+        self.product_number.setValidator(QIntValidator())
+        self.product_number.setMaxLength(2)
         self.product_number.setText('10')
 
         self.button_parameters = QPushButton('Aggiorna prodotti', self)
@@ -128,9 +135,10 @@ class App(QWidget):
 
     def update_image(self):
 
-        self.product_image = f'images/{str(self.product_combobox.currentText())}.jpg'
+        #perfromScraping(str(self.product_combobox.currentText()))
+        self.product_image = f'AmazonImages/{str(self.product_combobox.currentText())}.jpg'
         pixmap = QPixmap(self.product_image)
-        pixmap_resized = pixmap.scaled(200, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        pixmap_resized = pixmap.scaled(125, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             
         self.immage_original.setPixmap(pixmap_resized)
 
@@ -149,7 +157,7 @@ class App(QWidget):
 
         self.immage_original = QLabel(self)
         pixmap = QPixmap(self.product_image)
-        pixmap_resized = pixmap.scaled(200, 400, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        pixmap_resized = pixmap.scaled(125, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         
         self.immage_original.setPixmap(pixmap_resized)
         self.immage_original.setAlignment(Qt.AlignCenter)
