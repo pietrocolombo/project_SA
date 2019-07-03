@@ -59,7 +59,7 @@ def plot_confusion_matrix(cm, analysis_field, classes,
     plt.savefig(f'graphs/confusion_matrix_{analysis_field}_{string_normalized}.png', dpi = 180)
     plt.show()
 
-def sklearn_sa(analysis_field, normalized, split_type = None):
+def sklearn_sa(analysis_field, normalized, split_type = None, type = True):
 
     df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
 
@@ -77,8 +77,10 @@ def sklearn_sa(analysis_field, normalized, split_type = None):
     X_train_vectorized = vect.transform(X_train)
     X_train_vectorized.toarray()
 
-    #model = LogisticRegression()
-    model = RandomForestClassifier(n_estimators = 115, random_state = np.random.randint(df.shape[0]))
+    if(type):
+        model = LogisticRegression(n_jobs = -1)
+    else:
+        model = RandomForestClassifier(n_estimators = 115, random_state = np.random.randint(df.shape[0]), n_jobs = -1)
 
     model.fit(X_train_vectorized, y_train)
 
