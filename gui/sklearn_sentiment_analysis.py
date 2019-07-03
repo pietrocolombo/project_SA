@@ -8,8 +8,10 @@ import itertools
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
+
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import precision_recall_fscore_support as score
+from sklearn.ensemble import RandomForestClassifier
+
 from sklearn import metrics
 
 def weighted_splitting(df):
@@ -75,18 +77,21 @@ def sklearn_sa(analysis_field, normalized, split_type = None):
     X_train_vectorized = vect.transform(X_train)
     X_train_vectorized.toarray()
 
-    model = LogisticRegression()
+    #model = LogisticRegression()
+    model = RandomForestClassifier(n_estimators = 115, random_state = np.random.randint(df.shape[0]))
+
     model.fit(X_train_vectorized, y_train)
 
     predictions = model.predict(vect.transform(X_test))
 
     classes = sorted(df[analysis_field].unique(), reverse = True)
 
-    precision, recall, fscore, support = score(y_test, predictions)
-    accuracy = metrics.accuracy_score(y_test, predictions, normalize=True, sample_weight=None)
     confusion_matrix = metrics.confusion_matrix(y_test, predictions, labels = classes).T
+    metrics_matrix = metrics.classification_report(y_test, predictions)    
+    accuracy = metrics.accuracy_score(y_test, predictions, normalize=True, sample_weight=None)
 
     print(confusion_matrix)
+    print(metrics_matrix)
     print(accuracy)
 
     plot_confusion_matrix(

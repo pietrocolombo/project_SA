@@ -9,6 +9,7 @@ import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk import wordpunct_tokenize
+from nltk.stem.lancaster import LancasterStemmer
 
 def counting(reviews):
     tags = []
@@ -46,6 +47,9 @@ reviews_tokenized = reviews_tokenized.apply(lambda review: [item for item in rev
 
 punctuation = string.punctuation
 reviews_tokenized = reviews_tokenized.apply(lambda review: [item for item in review if item not in punctuation])
+
+lancaster_stemmer = LancasterStemmer()
+reviews_tokenized = reviews_tokenized.apply(lambda review: [lancaster_stemmer.stem(item) for item in review])
 
 words_list = [item for review in reviews_tokenized for item in review]
 counter_words = Counter(words_list)
