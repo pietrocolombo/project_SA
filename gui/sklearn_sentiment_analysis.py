@@ -28,7 +28,7 @@ def weighted_splitting(df):
 
     return train_df['clean_text'], test_df['clean_text'], train_df['sentiment'], test_df['sentiment']
 
-def plot_confusion_matrix(cm, analysis_field, classes,
+def plot_confusion_matrix(cm, analysis_field, classes, model_type,
                           normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues):
@@ -56,10 +56,10 @@ def plot_confusion_matrix(cm, analysis_field, classes,
     plt.tight_layout()
     plt.xlabel('True label')
     plt.ylabel('Predicted label')
-    plt.savefig(f'graphs/confusion_matrix_{analysis_field}_{string_normalized}.png', dpi = 180)
+    plt.savefig(f'graphs/confusion_matrix_{analysis_field}_{model_type}_{string_normalized}.png', dpi = 180)
     plt.show()
 
-def sklearn_sa(analysis_field, type = True, normalized = True, split_type = None):
+def sklearn_sa(analysis_field, model_type = 'regression', normalized = True, split_type = None):
 
     df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
 
@@ -77,7 +77,7 @@ def sklearn_sa(analysis_field, type = True, normalized = True, split_type = None
     X_train_vectorized = vect.transform(X_train)
     X_train_vectorized.toarray()
 
-    if(type):
+    if model_type == 'logistic_regression':
         model = LogisticRegression(n_jobs = -1)
     else:
         model = RandomForestClassifier(n_estimators = 115, random_state = np.random.randint(df.shape[0]), n_jobs = -1)
@@ -100,5 +100,6 @@ def sklearn_sa(analysis_field, type = True, normalized = True, split_type = None
             confusion_matrix,
             analysis_field,
             classes,
+            model_type,
             normalize=normalized
         )

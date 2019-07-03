@@ -97,8 +97,8 @@ class App(QWidget):
         self.radio_group1.addButton(self.logistic_regression)
         self.radio_group1.addButton(self.random_forest)
 
-        self.regression_field = QLabel(self)
-        self.regression_field.setText('Label for model:')
+        self.model_field = QLabel(self)
+        self.model_field.setText('Label for model:')
         self.radio_group2 = QButtonGroup(self.widget)
         self.sentiment_sklearn_sa = QRadioButton("Sentiment")
         self.sentiment_sklearn_sa.setChecked(True)
@@ -123,7 +123,7 @@ class App(QWidget):
         vbox.addWidget(self.type_model)
         vbox.addWidget(self.logistic_regression)
         vbox.addWidget(self.random_forest)
-        vbox.addWidget(self.regression_field)
+        vbox.addWidget(self.model_field)
         vbox.addWidget(self.sentiment_sklearn_sa)
         vbox.addWidget(self.stars_sklearn_sa)
         vbox.addWidget(self.normalization)
@@ -138,9 +138,9 @@ class App(QWidget):
 
     def on_click_sklearn_sa(self):
 
-        model_type = True
+        model_type = 'logistic_regression'
         if self.random_forest.isChecked():
-            model_type = False
+            model_type = 'random_forest'
 
         analysis_field = ''
         if self.sentiment_sklearn_sa.isChecked():
