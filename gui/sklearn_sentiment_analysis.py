@@ -59,7 +59,7 @@ def plot_confusion_matrix(cm, analysis_field, classes,
     plt.savefig(f'graphs/confusion_matrix_{analysis_field}_{string_normalized}.png', dpi = 180)
     plt.show()
 
-def sklearn_sa(analysis_field, normalized, split_type = None, type = True):
+def sklearn_sa(analysis_field, type = True, normalized = True, split_type = None):
 
     df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
 

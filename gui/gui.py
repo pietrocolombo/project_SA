@@ -1,5 +1,6 @@
 import warnings
 warnings.filterwarnings("ignore",category=DeprecationWarning)
+warnings.filterwarnings("ignore",category=UserWarning)
 import sys
 import subprocess
 import pandas as pd
@@ -87,29 +88,41 @@ class App(QWidget):
 
         self.widget = QWidget(self)
 
-        self.regression_field = QLabel(self)
-        self.regression_field.setText('Label for regression model:')
+        self.type_model = QLabel(self)
+        self.type_model.setText('Type of model:')
         self.radio_group1 = QButtonGroup(self.widget)
+        self.logistic_regression = QRadioButton("Logistic Regression")
+        self.logistic_regression.setChecked(True)
+        self.random_forest = QRadioButton("RandomForest")
+        self.radio_group1.addButton(self.logistic_regression)
+        self.radio_group1.addButton(self.random_forest)
+
+        self.regression_field = QLabel(self)
+        self.regression_field.setText('Label for model:')
+        self.radio_group2 = QButtonGroup(self.widget)
         self.sentiment_sklearn_sa = QRadioButton("Sentiment")
         self.sentiment_sklearn_sa.setChecked(True)
         self.stars_sklearn_sa = QRadioButton("Stars")
-        self.radio_group1.addButton(self.sentiment_sklearn_sa)
-        self.radio_group1.addButton(self.stars_sklearn_sa)
+        self.radio_group2.addButton(self.sentiment_sklearn_sa)
+        self.radio_group2.addButton(self.stars_sklearn_sa)
 
         self.normalization = QLabel(self)
         self.normalization.setText('Confusion matrix:')
-        self.radio_group2 = QButtonGroup(self.widget)
+        self.radio_group3 = QButtonGroup(self.widget)
         self.normalized = QRadioButton("Normalized")
         self.normalized.setChecked(True)
         self.not_normalized = QRadioButton("Not-Normalized")
-        self.radio_group2.addButton(self.normalized)
-        self.radio_group2.addButton(self.not_normalized)
+        self.radio_group3.addButton(self.normalized)
+        self.radio_group3.addButton(self.not_normalized)
 
         self.button_sklearn_sa = QPushButton('Esegui', self)
         self.button_sklearn_sa.setToolTip('Esegui')
         self.button_sklearn_sa.clicked.connect(self.on_click_sklearn_sa)
 
         vbox = QVBoxLayout()
+        vbox.addWidget(self.type_model)
+        vbox.addWidget(self.logistic_regression)
+        vbox.addWidget(self.random_forest)
         vbox.addWidget(self.regression_field)
         vbox.addWidget(self.sentiment_sklearn_sa)
         vbox.addWidget(self.stars_sklearn_sa)
@@ -125,6 +138,10 @@ class App(QWidget):
 
     def on_click_sklearn_sa(self):
 
+        model_type = True
+        if self.random_forest.isChecked():
+            model_type = False
+
         analysis_field = ''
         if self.sentiment_sklearn_sa.isChecked():
             analysis_field = 'sentiment'
@@ -135,7 +152,7 @@ class App(QWidget):
         if self.not_normalized.isChecked():
             normalized = False
 
-        sklearn_sa(analysis_field, normalized)
+        sklearn_sa(analysis_field, model_type, normalized)
 
     def create_parameters_Base_Aspect_SA(self):
         groupBox = QGroupBox("Parameters for Based-Aspect SA")
