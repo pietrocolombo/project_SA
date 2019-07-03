@@ -63,7 +63,7 @@ def sent_to_words(sentences):
         yield(gensim.utils.simple_preprocess(str(sentence), deacc=True))  # deacc=True removes punctuations
 
 
-def gensim_lda_product(product_id, n_execution, start = 1, limit = 10, step = 1, on_update=None):
+def gensim_lda_product(product_id, n_execution, start = 2, limit = 10, step = 1, on_update=None):
     df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
 
     product_df = df[df['productid'] == product_id].clean_text.values.tolist()
