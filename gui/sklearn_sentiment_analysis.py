@@ -64,9 +64,9 @@ def sklearn_sa(analysis_field, model_type = 'regression', normalized = True, spl
     df = pd.read_csv('../data/clean_dataset.csv', sep = ';', encoding='latin-1')
 
     if split_type and split_type == 'weighted':
-        X_train, X_test, y_train, y_test = weighted_splitting(df)
+        X_train, X_test, Y_train, Y_test = weighted_splitting(df)
     else:
-        X_train, X_test, y_train, y_test = train_test_split(df['clean_text'], df[analysis_field], \
+        X_train, X_test, Y_train, Y_test = train_test_split(df['clean_text'], df[analysis_field], \
                                     random_state=np.random.randint(df.shape[0]), \
                                     shuffle=True, train_size=0.80)
     print(X_train.shape)
@@ -82,15 +82,15 @@ def sklearn_sa(analysis_field, model_type = 'regression', normalized = True, spl
     else:
         model = RandomForestClassifier(n_estimators = 115, random_state = np.random.randint(df.shape[0]), n_jobs = -1)
 
-    model.fit(X_train_vectorized, y_train)
+    model.fit(X_train_vectorized, Y_train)
 
     predictions = model.predict(vect.transform(X_test))
 
     classes = sorted(df[analysis_field].unique(), reverse = True)
 
-    confusion_matrix = metrics.confusion_matrix(y_test, predictions, labels = classes).T
-    metrics_matrix = metrics.classification_report(y_test, predictions)    
-    accuracy = metrics.accuracy_score(y_test, predictions, normalize=True, sample_weight=None)
+    confusion_matrix = metrics.confusion_matrix(Y_test, predictions, labels = classes).T
+    metrics_matrix = metrics.classification_report(Y_test, predictions)    
+    accuracy = metrics.accuracY_score(Y_test, predictions, normalize=True, sample_weight=None)
 
     print(confusion_matrix)
     print(metrics_matrix)

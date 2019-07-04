@@ -55,7 +55,7 @@ class App(QWidget):
 
         self.sentiment_tb_sa = QRadioButton("Sentiment")
         self.sentiment_tb_sa.setChecked(True)
-        self.score_tb_sa = QRadioButton("Score")
+        self.score_tb_sa = QRadioButton("Voto stelle")
 
         self.button_tb_sa = QPushButton('Esegui', self)
         self.button_tb_sa.setToolTip('Esegui')
@@ -88,7 +88,7 @@ class App(QWidget):
         self.widget = QWidget(self)
 
         self.type_model = QLabel(self)
-        self.type_model.setText('Type of model:')
+        self.type_model.setText('Seleziona il tipo di modello da utilizzare:')
         self.radio_group1 = QButtonGroup(self.widget)
         self.logistic_regression = QRadioButton("Logistic Regression")
         self.logistic_regression.setChecked(True)
@@ -97,20 +97,20 @@ class App(QWidget):
         self.radio_group1.addButton(self.random_forest)
 
         self.model_field = QLabel(self)
-        self.model_field.setText('Label for model:')
+        self.model_field.setText('Campo sul quale applicare il modello:')
         self.radio_group2 = QButtonGroup(self.widget)
         self.sentiment_sklearn_sa = QRadioButton("Sentiment")
         self.sentiment_sklearn_sa.setChecked(True)
-        self.stars_sklearn_sa = QRadioButton("Stars")
+        self.stars_sklearn_sa = QRadioButton("Voto stelle")
         self.radio_group2.addButton(self.sentiment_sklearn_sa)
         self.radio_group2.addButton(self.stars_sklearn_sa)
 
         self.normalization = QLabel(self)
-        self.normalization.setText('Confusion matrix:')
+        self.normalization.setText('Matrice di confusione:')
         self.radio_group3 = QButtonGroup(self.widget)
-        self.normalized = QRadioButton("Normalized")
+        self.normalized = QRadioButton("Normalizzata")
         self.normalized.setChecked(True)
-        self.not_normalized = QRadioButton("Not-Normalized")
+        self.not_normalized = QRadioButton("Non normalizzata")
         self.radio_group3.addButton(self.normalized)
         self.radio_group3.addButton(self.not_normalized)
 
@@ -169,14 +169,14 @@ class App(QWidget):
         groupBox = QGroupBox("Based-Aspect SA con Gensim LDA")
 
         self.product_number_label = QLabel(self)
-        self.product_number_label.setText('Numero di prodotti disponibili:')
+        self.product_number_label.setText('Numero di prodotti in elenco:')
         self.product_number = QLineEdit(self)
         self.product_number.setValidator(QIntValidator())
         self.product_number.setMaxLength(2)
         self.product_number.setText('10')
 
-        self.button_parameters = QPushButton('Aggiorna prodotti', self)
-        self.button_parameters.setToolTip('Aggiorna prodotti')
+        self.button_parameters = QPushButton('Aggiorna numero prodotti', self)
+        self.button_parameters.setToolTip('Aggiorna numero prodotti')
         self.button_parameters.clicked.connect(self.on_click_update_products)
         
         self.product_label = QLabel(self)
