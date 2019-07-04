@@ -3,11 +3,10 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 import os
 import re
 import pandas as pd
+import matplotlib.pyplot as plt
 import webbrowser
 import platform
 from textblob import TextBlob
-
-
 
 # Gensim
 import gensim
@@ -84,6 +83,7 @@ def gensim_lda_product(product_id, n_execution, start = 2, limit = 10, step = 1,
     on_update(95)
 
     polarity_df = sentiment_topic(best_model)
+    plot_sentiment_topic(polarity_df)
 
     #pyLDAvis.show(LDAvis_prepared)
     url = f'lda_model/lda_{n_execution}.html'
@@ -91,6 +91,38 @@ def gensim_lda_product(product_id, n_execution, start = 2, limit = 10, step = 1,
         url = 'file:///' + os.path.dirname(os.path.abspath('gensim_lda.py')) + '/' + url
     webbrowser.open_new_tab(url)
     on_update(100)
+
+def plot_sentiment_topic(df):
+    
+    bars = []
+
+    plt.figure()
+    polarity = list(df['polarity'])
+    mean_polarity = df['polarity'].mean()
+    for i in range(len(polarity)):
+        color = 'orange'
+        if polarity[i] < 0:
+            color = 'red'
+        elif polarity[i] > 0:
+            color = 'green'
+
+        bars.append(plt.bar(i+1, polarity[i], width = 0.7, color = color, alpha = 0.5))
+
+    sum_bars = bars[0]
+    for bar in bars[1:]:
+        sum_bars += bar
+    for rect in sum_bars:
+        height = rect.get_height()
+        plt.text(rect.get_x() + rect.get_width()/2.0, height, '%.2f' % float(height), ha='center', va='bottom')
+
+    plt.plot(range(1,len(polarity)+1), [mean_polarity]*len(polarity), 'orange')
+
+
+    plt.xlabel('Topic')
+    plt.ylabel('Polarity')
+    plt.savefig('graphs/polarity_topic.png', dpi = 180)
+    plt.show()
+
 
 def sentiment_topic(lda_model):
 
