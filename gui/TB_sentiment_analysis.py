@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from collections import Counter
 from textblob import TextBlob
 
@@ -29,6 +30,11 @@ def text_blob_sa(self, analysis_field):
         df['sentiment'] = df['sentiment'].apply(sentiment_number)
     else:
         df = self.sa_df
+
+    plt.figure()
+    sns.boxenplot(x=analysis_field, y='polarity', data=df)
+    plt.savefig(f'graphs/tb_polarity_each_{analysis_field}.png', dpi = 180)
+    plt.show();
 
     analysis = df[analysis_field]
     if analysis_field == 'score':
